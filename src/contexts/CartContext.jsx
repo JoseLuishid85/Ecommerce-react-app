@@ -139,42 +139,44 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = async (product, quantity = 1, variedadId = null) => {
+    // Verificar si el usuario está autenticado
+    if (!user) {
+      return { success: false, requiresAuth: true, message: 'Debes iniciar sesión para agregar productos al carrito' };
+    }
+
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
 
       const cartItem = {
         id: Math.random().toString(36).substr(2, 9),
         productId: product.id,
-        name: product.nombre,
+        name: product.titulo || product.nombre,
         precio: product.precio,
         cantidad: quantity,
-        imagen: product.imagen,
+        imagen: product.portada || product.imagen,
         variedadId: variedadId || undefined
       };
 
-      if (user) {
-        try {
-          await ApiCartService.addToCart({
-            productoId: product.id,
-            variedadId: variedadId,
-            clienteId: user.id,
-            cantidad: quantity,
-            precio: product.precio
-          });
-          await loadCart();
-        } catch (apiError) {
-          console.warn('API call failed, using local storage:', apiError);
-          const updatedItems = [...state.items, cartItem];
-          await AsyncStorage.setItem('cart', JSON.stringify({ items: updatedItems }));
-          dispatch({ type: 'ADD_ITEM', payload: cartItem });
-        }
-      } else {
+      try {
+        await ApiCartService.addToCart({
+          productoId: product.id,
+          variedadId: variedadId,
+          clienteId: user.id,
+          cantidad: quantity,
+          precio: product.precio
+        });
+        await loadCart();
+        return { success: true, message: 'Producto agregado al carrito' };
+      } catch (apiError) {
+        console.warn('API call failed, using local storage:', apiError);
         const updatedItems = [...state.items, cartItem];
         await AsyncStorage.setItem('cart', JSON.stringify({ items: updatedItems }));
         dispatch({ type: 'ADD_ITEM', payload: cartItem });
+        return { success: true, message: 'Producto agregado al carrito' };
       }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
+      return { success: false, message: error.message };
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
