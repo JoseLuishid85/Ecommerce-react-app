@@ -109,14 +109,6 @@ const Header = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Barra de bienvenida si está autenticado */}
-      {isAuthenticated && route.name === 'Home' && (
-        <View style={styles.welcomeBar}>
-          <Text style={styles.welcomeText}>
-            Hola, {user?.nombres || 'Usuario'}
-          </Text>
-        </View>
-      )}
     </View>
   );
 };
