@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npx expo start:*)",
-      "Bash(npx expo install:*)"
+      "Bash(npx expo install:*)",
+      "Bash(ls -la \"C:\\\\react\\\\ecommerce-app\\\\src\\\\services\"\" 2>/dev/null || echo \"No services directory \")"
     ]
   }
 }

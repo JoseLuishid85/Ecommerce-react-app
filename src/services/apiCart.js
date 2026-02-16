@@ -1,148 +1,71 @@
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'https://tu-api.com/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-// Crear instancia de axios
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
-
-// Interceptor para requests
-api.interceptors.request.use(
-  (config) => {
-    // Aquí puedes agregar el token de autenticación si es necesario
-    // const token = await AsyncStorage.getItem('clientToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+class ApiCartService {
+  constructor() {
+    this.baseURL = API_BASE_URL;
   }
-);
 
-// Interceptor para responses
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error);
-    return Promise.reject(error);
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    const token = await AsyncStorage.getItem('clientToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(url, config);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Cart request failed:', error);
+      throw error;
+    }
   }
-);
 
-export const ApiCartService = {
-  // Obtener carrito
-  getCart: async () => {
-    try {
-      // Simular respuesta de API
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            carrito: [],
-            total: 0,
-            itemCount: 0
-          });
-        }, 500);
-      });
-      
-      // Para uso real con API:
-      // const response = await api.get('/carrito');
-      // return response.data;
-    } catch (error) {
-      console.error('Error getting cart:', error);
-      throw new Error('Error al obtener el carrito');
-    }
-  },
+  async getCart() {
+    return this.request('/customer/cliente');
+  }
 
-  // Agregar al carrito
-  addToCart: async (cartItem) => {
-    try {
-      // Simular respuesta de API
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            message: 'Producto agregado al carrito'
-          });
-        }, 500);
-      });
-      
-      // Para uso real con API:
-      // const response = await api.post('/carrito/agregar', cartItem);
-      // return response.data;
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      throw new Error('Error al agregar producto al carrito');
-    }
-  },
+  async addToCart(product) {
+    return this.request('/customer', {
+      method: 'POST',
+      body: JSON.stringify(product),
+    });
+  }
 
-  // Actualizar item del carrito
-  updateCartItem: async (itemId, updates) => {
-    try {
-      // Simular respuesta de API
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            message: 'Carrito actualizado'
-          });
-        }, 500);
-      });
-      
-      // Para uso real con API:
-      // const response = await api.put(`/carrito/actualizar/${itemId}`, updates);
-      // return response.data;
-    } catch (error) {
-      console.error('Error updating cart item:', error);
-      throw new Error('Error al actualizar producto en el carrito');
-    }
-  },
+  async updateCartItem(itemId, data) {
+    return this.request(`/customer/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
 
-  // Eliminar del carrito
-  removeFromCart: async (itemId) => {
-    try {
-      // Simular respuesta de API
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            message: 'Producto eliminado del carrito'
-          });
-        }, 500);
-      });
-      
-      // Para uso real con API:
-      // const response = await api.delete(`/carrito/eliminar/${itemId}`);
-      // return response.data;
-    } catch (error) {
-      console.error('Error removing from cart:', error);
-      throw new Error('Error al eliminar producto del carrito');
-    }
-  },
+  async removeFromCart(itemId) {
+    return this.request(`/customer/${itemId}`, {
+      method: 'DELETE',
+    });
+  }
 
-  // Limpiar carrito
-  clearCart: async () => {
-    try {
-      // Simular respuesta de API
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            message: 'Carrito limpiado'
-          });
-        }, 500);
-      });
-      
-      // Para uso real con API:
-      // const response = await api.delete('/carrito/limpiar');
-      // return response.data;
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-      throw new Error('Error al limpiar el carrito');
-    }
-  },
-};
+  async deleteCartClient(userId) {
+    return this.request(`/customer/cliente/${userId}`, {
+      method: 'DELETE',
+    });
+  }
+}
 
-export default ApiCartService;
+export const ApiCartServiceInstance = new ApiCartService();
+export default ApiCartServiceInstance;

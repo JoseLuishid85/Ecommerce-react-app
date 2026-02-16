@@ -51,20 +51,33 @@ class ApiService {
     return this.request('/publico/lista_categorias');
   }
 
-  // Pedidos
-  async createOrder(orderData) {
-    return this.request('/orders', {
+  // Direcciones
+  async getAddresses(clienteId) {
+    return this.request(`/direccion/cliente/${clienteId}`);
+  }
+
+  async createAddress(addressData) {
+    return this.request('/direccion', {
+      method: 'POST',
+      body: JSON.stringify(addressData),
+    });
+  }
+
+  // Bancos
+  async getBancos() {
+    return this.request('/publico/lista_bancos');
+  }
+
+  // Ventas
+  async createVenta(orderData) {
+    return this.request('/venta', {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
   }
 
-  async getOrders() {
-    return this.request('/orders');
-  }
-
-  async getOrder(id) {
-    return this.request(`/orders/${id}`);
+  async getMyOrders() {
+    return this.request('/venta/');
   }
 
   // Autenticación

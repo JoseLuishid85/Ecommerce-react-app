@@ -18,6 +18,7 @@ import CheckoutScreen from './src/screens/CheckoutScreen';
 import AuthScreen from './src/screens/AuthScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import PlaceholderScreen from './src/screens/PlaceholderScreen';
+import OrdersScreen from './src/screens/OrdersScreen';
 
 const Stack = createStackNavigator();
 
@@ -43,7 +44,7 @@ const App = () => {
               <Stack.Screen name="Categories" component={PlaceholderScreen} />
               <Stack.Screen name="Offers" component={PlaceholderScreen} />
               <Stack.Screen name="Contact" component={PlaceholderScreen} />
-              <Stack.Screen name="Orders" component={PlaceholderScreen} />
+              <Stack.Screen name="Orders" component={OrdersScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </CartProvider>

@@ -108,7 +108,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     loadCart();
-  }, []);
+  }, [user]);
 
   const loadCart = async () => {
     try {
@@ -238,7 +238,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const clearCart = () => {
+  const clearCart = async () => {
+    try {
+      if (user) {
+        await ApiCartService.deleteCartClient(user.id);
+      }
+    } catch (error) {
+      console.warn('Error clearing cart on API:', error);
+    }
     dispatch({ type: 'CLEAR_CART' });
     AsyncStorage.removeItem('cart');
   };

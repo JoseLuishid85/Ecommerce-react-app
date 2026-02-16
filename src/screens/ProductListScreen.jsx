@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  ScrollView,
   Image,
   ActivityIndicator,
   Dimensions,
@@ -186,31 +187,33 @@ const ProductListScreen = ({ navigation, route }) => {
       </View>
 
       {/* Categorías horizontales */}
-      <FlatList
-        horizontal
-        data={[{ id: '', nombre: 'Todas' }, ...categories]}
-        keyExtractor={(item) => item.id.toString()}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesList}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              selectedCategory === item.id.toString() && styles.categoryChipActive,
-            ]}
-            onPress={() => setSelectedCategory(item.id.toString())}
-          >
-            <Text
+      <View style={styles.categoriesContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoriesList}
+        >
+          {[{ id: '', nombre: 'Todas' }, ...categories].map((item) => (
+            <TouchableOpacity
+              key={item.id.toString()}
               style={[
-                styles.categoryChipText,
-                selectedCategory === item.id.toString() && styles.categoryChipTextActive,
+                styles.categoryChip,
+                selectedCategory === item.id.toString() && styles.categoryChipActive,
               ]}
+              onPress={() => setSelectedCategory(item.id.toString())}
             >
-              {item.nombre}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  selectedCategory === item.id.toString() && styles.categoryChipTextActive,
+                ]}
+              >
+                {item.nombre}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       {/* Contador de resultados */}
       <View style={styles.resultsHeader}>
@@ -344,9 +347,16 @@ const styles = StyleSheet.create({
   viewToggleButtonActive: {
     backgroundColor: '#FFFFFF',
   },
+  categoriesContainer: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    height: 52,
+  },
   categoriesList: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    alignItems: 'center',
+    height: 52,
   },
   categoryChip: {
     backgroundColor: '#FFFFFF',
